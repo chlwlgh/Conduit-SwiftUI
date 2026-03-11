@@ -7,14 +7,20 @@
 
 import Foundation
 class AuthViewModel: ObservableObject {
-    
+
     @Published var isLoggedIn = false
     @Published var token: String? = nil
     @Published var userState: LoginSuccess? = nil
     @Published var userArticle: TrendingArticles? = nil
     @Published var isLoading: Bool = true
-    
-    init() {
+
+    private let authServices: AuthServicesProtocol
+    private let articleServices: ArticleServicesProtocol
+
+    init(authServices: AuthServicesProtocol = AuthServices(),
+         articleServices: ArticleServicesProtocol = ArticleServices()) {
+        self.authServices = authServices
+        self.articleServices = articleServices
         getProfile()
     }
     
@@ -24,7 +30,7 @@ class AuthViewModel: ObservableObject {
     
     func getArticles(parameters: ArticleListParams) {
         isLoading = true
-        ArticleServices().getTrendingArticle(parameters: parameters.toDictionary()){
+        articleServices.getTrendingArticle(parameters: parameters.toDictionary()){
             result in
             switch result {
             case .success(let data):
@@ -46,7 +52,7 @@ class AuthViewModel: ObservableObject {
     }
     
     func getProfile() {
-        AuthServices().getUser(parameters: nil) {
+        authServices.getUser(parameters: nil) {
             result in
             switch result {
             case .success(let data):

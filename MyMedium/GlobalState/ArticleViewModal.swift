@@ -14,18 +14,27 @@ class ArticleViewModel: ObservableObject {
     @Published var showFlitterScreen: Bool = false
     @Published var isLoading = true
     @Published var flitterParameters: ArticleListParams = ArticleListParams(limit: "10", offset: "0")
-    
+
     @Published var selectedArticle: Article = DummyData().data
     @Published var comments: CommentListResponse?
-    
-    init() {
+
+    private let articleServices: ArticleServicesProtocol
+    private let commentsServices: CommentsServicesProtocol
+    private let favoritesServices: FavoritesServicesProtocol
+
+    init(articleServices: ArticleServicesProtocol = ArticleServices(),
+         commentsServices: CommentsServicesProtocol = CommentsServices(),
+         favoritesServices: FavoritesServicesProtocol = FavoritesServices()) {
+        self.articleServices = articleServices
+        self.commentsServices = commentsServices
+        self.favoritesServices = favoritesServices
         getArticles()
         getTags()
     }
     
     
     func getComments () {
-        CommentsServices().getComments(parameters: nil,
+        commentsServices.getComments(parameters: nil,
                                        endpoint:
                 selectedArticle.slug! + "/comments", completion: {
             res in
@@ -53,7 +62,7 @@ class ArticleViewModel: ObservableObject {
     }
     
     func getTags() {
-        ArticleServices().getTags(parameters: nil){
+        articleServices.getTags(parameters: nil){
             result in
             switch result {
             case .success(let data):
@@ -83,7 +92,7 @@ class ArticleViewModel: ObservableObject {
     func getArticles() {
         print(flitterParameters.toDictionary())
         isLoading = true
-        ArticleServices().getTrendingArticle(parameters: flitterParameters.toDictionary()){
+        articleServices.getTrendingArticle(parameters: flitterParameters.toDictionary()){
             result in
             self.isLoading = false
             switch result {
@@ -117,7 +126,7 @@ class ArticleViewModel: ObservableObject {
     
     
     func bookMarkArticle (onComplete: @escaping (Article?,String?) -> Void) {
-        FavoritesServices().bookMarkArticle(parameters: nil, endpoint: "\(selectedArticle.slug ?? "")/favorite"){
+        favoritesServices.bookMarkArticle(parameters: nil, endpoint: "\(selectedArticle.slug ?? "")/favorite"){
             res in
             switch res {
             case .success(let data):
@@ -147,7 +156,7 @@ class ArticleViewModel: ObservableObject {
     
     
     func removeBookMarkArticle (onComplete: @escaping (Article?,String?) -> Void) {
-        FavoritesServices().removeBookMarkArticle(parameters: nil, endpoint: "\(selectedArticle.slug ?? "")/favorite"){
+        favoritesServices.removeBookMarkArticle(parameters: nil, endpoint: "\(selectedArticle.slug ?? "")/favorite"){
             res in
             switch res {
             case .success(let data):
@@ -169,7 +178,7 @@ class ArticleViewModel: ObservableObject {
     }
     
     func getSignalArticle()  {
-        ArticleServices().getSignalArticle(parameters: nil, endpoint: selectedArticle.slug!, completion: { res in
+        articleServices.getSignalArticle(parameters: nil, endpoint: selectedArticle.slug!, completion: { res in
             switch res {
             case .success(let data):
                 self.selectedArticle = data.article!

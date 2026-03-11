@@ -10,19 +10,22 @@ import Foundation
 import SwiftUI
 
 class FeedArticleViewModel: ObservableObject {
-    
+
     @Published var articleData: FeedArticle? = FeedArticle(articles: [],articlesCount: 0)
     @Published var isLoading = true
     @Published var flitterParameters: ArticleListParams = ArticleListParams(limit: "10", offset: "0")
-    
-    init() {
+
+    private let articleServices: ArticleServicesProtocol
+
+    init(articleServices: ArticleServicesProtocol = ArticleServices()) {
+        self.articleServices = articleServices
         getArticles()
     }
     
     func getArticles() {
         print(flitterParameters.toDictionary())
         isLoading = true
-        ArticleServices().getFeedArticle(parameters: flitterParameters.toDictionary()){
+        articleServices.getFeedArticle(parameters: flitterParameters.toDictionary()){
             result in
             self.isLoading = false
             switch result {

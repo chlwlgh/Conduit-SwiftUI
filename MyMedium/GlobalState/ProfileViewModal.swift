@@ -7,15 +7,21 @@
 
 import Foundation
 class ProfileViewModel: ObservableObject {
-    
+
     @Published var selectedAuthor: Author = DummyData().authorData
     @Published var selectedUserArticle: TrendingArticles? = nil
     @Published var isLoading: Bool = false
+
+    private let articleServices: ArticleServicesProtocol
+
+    init(articleServices: ArticleServicesProtocol = ArticleServices()) {
+        self.articleServices = articleServices
+    }
     
     
     func selectedAuthorArticle(parameters: ArticleListParams) {
         isLoading = true
-        ArticleServices().getTrendingArticle(parameters: parameters.toDictionary()){
+        articleServices.getTrendingArticle(parameters: parameters.toDictionary()){
             result in
             switch result {
             case .success(let data):
