@@ -81,6 +81,27 @@ View (@EnvironmentObject VM)
 3. iOS Simulator 또는 실제 디바이스에서 빌드/실행
 4. 별도의 백엔드 설정 불필요 (공용 RealWorld API 사용)
 
+## CI (GitHub Actions)
+- 워크플로우 파일: `.github/workflows/ci.yml`
+- 트리거: `main` 브랜치 push 및 PR
+- 러너: `macos-14`, Xcode 15.4
+- 시뮬레이터: iPhone 15 (iOS 17.5)
+- 빌드 플래그: `CODE_SIGNING_ALLOWED=NO`
+- 테스트: `-only-testing:MyMediumTests` (24개 ViewModel 단위 테스트)
+- SPM 캐시: `actions/cache@v4`로 의존성 캐싱
+
+## Unit Tests
+- 테스트 타겟: `MyMediumTests` (non-hosted, 소스 직접 컴파일)
+- 테스트 수: 24개 (Auth 4, Article 5, FeedArticle 3, Comments 3, Profile 3, App 2, NavigationStack 4)
+- Mock 패턴: `Mock{Service}` → `{Service}Protocol` conform, `Result` 프로퍼티로 반환값 설정
+- Fixture: `TestData.swift`에 RealWorld API spec 기반 테스트 데이터
+- 로컬 실행:
+  ```bash
+  xcodebuild test -project MyMedium.xcodeproj -scheme MyMedium \
+    -destination 'platform=iOS Simulator,name=iPhone 16e,OS=18.5' \
+    -only-testing:MyMediumTests CODE_SIGNING_ALLOWED=NO
+  ```
+
 ## Auth 모듈 (MyMedium/Auth/)
 - `CreateAccont/CreateAccountScreen.swift`: 회원가입 화면 (디렉토리명 "CreateAccont"는 "CreateAccount" 타이포)
 

@@ -1,3 +1,5 @@
+[![CI](https://github.com/chlwlgh/Conduit-SwiftUI/actions/workflows/ci.yml/badge.svg)](https://github.com/chlwlgh/Conduit-SwiftUI/actions/workflows/ci.yml)
+
 # ![RealWorld Example App](images/logo.png)
 
 > ### SwiftUI codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
